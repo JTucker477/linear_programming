@@ -232,7 +232,6 @@ array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     // For each of the 100 instances of the problem
     for (int i = 0; i < 1; i++){
         array <ll , 100> solution = random_solution();
-        array <ll , 100> multiply_result;
         ll lowest_residue;
         array <ll , 100> multiply_result = solution; 
         // element wise multiplication of input Result is stored in multiply_result. input is unchanged
