@@ -265,7 +265,52 @@ array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     return final; 
 }
 
-//  simmulated annealing
+//  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
+
+array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
+    //Start with a random solution S
+    array <ll , 100> final;
+
+    // For each of the 100 instances of the problem
+    for (int i = 0; i < 1; i++){
+        array <ll , 100> solution = random_solution();
+        ll lowest_residue;
+        // John's approach
+        array <ll , 100> multiply_result = solution; 
+        // element wise multiplication of input Result is stored in multiply_result. input is unchanged
+        transform( input[i].begin(), input[i].end(),
+                    multiply_result.begin(), multiply_result.end(),  
+                    std::multiplies<int>() );
+        lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
+
+        for (int i = 0; i < max_iter ; i ++ ){  
+            // get a random neighbor
+            array <ll , 100> neighbor = random_neighbor(solution);
+
+            // Find residue result 
+            array <ll , 100> temp_multiply_result;
+            temp_multiply_result = neighbor;
+
+            transform( input[i].begin(), input[i].end(),
+                    temp_multiply_result.begin(), temp_multiply_result.end(),  
+                    std::multiplies<int>() );
+
+            // printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
+            
+            ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
+            if (current_residue < lowest_residue){
+                lowest_residue = current_residue;
+            }
+            else {
+                //  S = S′ with probability exp(−(res(S′)-res(S))/T(iter))
+            }
+            // if residue(S) < residue(S′′) then S′′ = S
+        }
+        final[i] = lowest_residue;
+    }
+    return final; 
+}
+
 // int sim_anneal(vector <unsigned long long> A, int iterations) {
 //     vector <unsigned long long> result;
 //     // unsigned long long residue;
