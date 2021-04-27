@@ -7,6 +7,7 @@
 #include <random>
 #include <cmath> 
 #include <cstdlib>
+#include <tuple>
 using namespace std;
 
 // Returns std array that has a 100 instances of 100 random numbers to input into our algorithms 
@@ -105,11 +106,33 @@ array <unsigned long long , 100> karmarkar(array<array <unsigned long long , 100
 }   
 
 // Returns two random subsets of the inputed array. STILL TO DO
-array<array <unsigned long long , 100> , 2> create_random_set_division(array <unsigned long long , 100> input){
-    array <unsigned long long , 100> s1;
-    array <unsigned long long , 100> s2;
+// need to return two sets (return two things!)
+// initialize 
+// each array is at most 100 but should be 
+// test
+pair<vector <unsigned long long >, vector <unsigned long long> > create_random_set_division(array <unsigned long long , 100> input){
+    // array <unsigned long long , 100> s1;
+    // array <unsigned long long , 100> s2;
+    vector <unsigned long long> s1;
+    vector <unsigned long long> s2;
 
-    for (int i = 0; i < 100 ; i++){
+    // add elements to random subset
+    for (int i = 0; i < 100; i++)
+    {
+        if (rand()%2 == 0)
+        {
+            s1.push_back(input[i]);
+        }
+        // if not in random subset, add to another subset
+        else {
+            s2.push_back(input[i]);
+        }
+    }
+    return make_pair(s1,s2);
+}
+
+
+    // for (int i = 0; i < 100 ; i++){
     // for (int i = 0; i < 100; i++){
     //     if (rand()%2 == 0){
 
@@ -118,15 +141,20 @@ array<array <unsigned long long , 100> , 2> create_random_set_division(array <un
     //         s1
     //     }
     // }
-    }
-}
+    // }
 
 
+// Heuristics
 
+// repeated random
 // Maybe create two random subsets within
 array <unsigned long long , 100> repeated_random(){
     // Create random solution
 }
+
+// hill climbing
+
+//  simmulated annealing
 
 
 int main(){
