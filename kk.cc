@@ -146,11 +146,27 @@ pair<vector <unsigned long long >, vector <unsigned long long> > create_random_s
 
 // Heuristics
 
+
+// Repeated random: repeatedly generate random solutions to the problem, as determined by the representation.
+// Start with a random solution S for iter = 1 to max iter
+    // S′ = a random solution
+    // if residue(S′) < residue(S) then S = S′ 
+// return S
+
 // repeated random
 // Maybe create two random subsets within
+
+//pseudocode
+vector a;
+for (int i = 0; i < 100; i++)
+{
+    a.push_back(rand())
+}
+
 array <unsigned long long , 100> repeated_random(){
     // Create random solution
 }
+
 
 // hill climbing
 
