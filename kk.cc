@@ -112,6 +112,16 @@ array <ll , 100> karmarkar(array<array <ll , 100>,100> input){
 
 }   
 
+// John can you do this?
+//RESIDUE FUNCTION
+// ll calc_residue(array<ll , 100> input){
+//     array <ll , 100> multiply_result = input;
+//     ll lowest_residue;
+//         transform(input[i].begin(), input[i].end(),
+//                 multiply_result.begin(), multiply_result.end(),  
+//                 std::multiplies<int>() );
+//         lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
+// }
 
 
 array <ll, 100 > random_solution(){
@@ -138,6 +148,7 @@ array <ll , 100> repeated_random (array<array <ll , 100>,100> input){
     array <ll , 100> final; 
     
     // For each of the 100 instances of the problem
+    // ?? is the transform i's different?
     for (int i = 0; i < 1; i++){
         array <ll , 100> solution;
         array <ll , 100> multiply_result;
@@ -178,9 +189,102 @@ array <ll , 100> repeated_random (array<array <ll , 100>,100> input){
     return final; 
 }
 
-// hill climbing
+// RANDOM NEIGHBOR GENERATION
+    // A random neighbor 
+    // Recall: a neighbor of a solution S is the one such that differs from S in 
+        // one or two places.
+        // Aka, if A1 represents +1 and A2 -1 values,
+        // then moving from S to a neighbor is accomplished either by
+            // moving one or two elements from A1 to A2, or moving one or two elements from A2 to A1
+array <ll, 100 > random_neighbor(array <ll , 100> sol){
+    array <ll , 100> rand_neighbor = sol;
+    int rand_i = rand() % (rand_neighbor.size() - 1);
+    int rand_j;
+    // makes sure i != j
+    do {
+        int rand_j = rand() % (rand_neighbor.size() - 1);
+    } while (rand_i != rand_j);
+    // perform a random move on the current solution to get a random neighbor
+    // set s_i to - s_i
+    rand_neighbor[rand_i] = -sol[rand_i];
+    // with probablity 1/2, set s_j to -s-j
+    if (rand()%2 == 0){
+        rand_neighbor[rand_j] = -1;
+    }
+    else{
+        rand_neighbor[rand_j] = 1;
+    }
+    return rand_neighbor;
+}
+
+
+// HILL CLIMBING
+ // (from section )
+    // Pick a starting point x
+    // While there is a neighbor y in N(x) with f(y) < f(x), set x to y and continue
+    // return final solution
+    // how to prevent getting stuck in local optima?
+
+array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
+    //Start with a random solution S
+    array <ll , 100> final;
+
+    // For each of the 100 instances of the problem
+    for (int i = 0; i < 1; i++){
+        array <ll , 100> solution = random_solution();
+        array <ll , 100> multiply_result;
+        ll lowest_residue;
+        array <ll , 100> multiply_result = solution; 
+        // element wise multiplication of input Result is stored in multiply_result. input is unchanged
+        transform( input[i].begin(), input[i].end(),
+                    multiply_result.begin(), multiply_result.end(),  
+                    std::multiplies<int>() );
+        lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
+
+        for (int i = 0; i < max_iter ; i ++ ){  
+            // get a random neighbor
+            array <ll , 100> neighbor = random_neighbor(solution);
+
+            // Find residue result 
+            array <ll , 100> temp_multiply_result;
+            temp_multiply_result = neighbor;
+
+            transform( input[i].begin(), input[i].end(),
+                    temp_multiply_result.begin(), temp_multiply_result.end(),  
+                    std::multiplies<int>() );
+
+            // printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
+            
+            ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
+            if (current_residue < lowest_residue){
+                lowest_residue = current_residue;
+            }
+        }
+        final[i] = lowest_residue;
+    }
+    return final; 
+}
 
 //  simmulated annealing
+// int sim_anneal(vector <unsigned long long> A, int iterations) {
+//     vector <unsigned long long> result;
+//     // unsigned long long residue;
+//     for (int i = 0; i < iterations; i++)
+//     {
+//         // 
+//         // find random neighbor 
+//         // residuecomp
+//         if () {
+//             // set residue
+//         }
+//         else if (/*rand*/){
+
+//         }
+//         // choose the best res, min
+//     }
+    
+//     return //best res
+// }
 
 
 int main(){
@@ -285,3 +389,4 @@ int main(){
 
 
 // }
+
