@@ -233,6 +233,7 @@ array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     for (int i = 0; i < 1; i++){
         array <ll , 100> solution = random_solution();
         ll lowest_residue;
+        // John's approach
         array <ll , 100> multiply_result = solution; 
         // element wise multiplication of input Result is stored in multiply_result. input is unchanged
         transform( input[i].begin(), input[i].end(),
