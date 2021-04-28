@@ -334,55 +334,67 @@ ll hill_climb (array <ll , 100> input, bool pp){
 ll sim_anneal (array <ll , 100> input, bool pp){
     //Start with a random solution S
    
-    array <ll , 100> solution;
+    array <ll , 100> sol;
     if (pp){
-        solution = random_solution_PP();
+        sol = random_solution_PP();
     }
     else{
-        solution = random_solution();
+        sol = random_solution();
     } 
+
+    array <ll , 100> s2 = sol;
 
     ll lowest_residue;
     if (pp){
-        lowest_residue = calc_residue_PP(input, solution);
+        lowest_residue = calc_residue_PP(input, sol);
     } 
     else{
-        lowest_residue = calc_residue(input, solution);
+        lowest_residue = calc_residue(input, sol);
     }
 
     for (int j = 0; j < max_iter ; j ++ ){
         // Try a new random solution
-        array <ll , 100> new_sol;
+        array <ll , 100> s1;
         if (pp){
-            new_sol = random_neighbor_pp(solution);
+            s1 = random_neighbor_pp(sol);
         }
         else{
-            new_sol = random_neighbor(solution);
+            s1 = random_neighbor(sol);
         } 
 
-        ll current_residue;
+        ll residue1;
         if (pp){
-            current_residue = calc_residue_PP(input, new_sol);
+            residue1 = calc_residue_PP(input, sol);
         }
         else{
-            current_residue = calc_residue(input, new_sol);
+            residue1 = calc_residue(input, sol);
         } 
 
-        if (current_residue < lowest_residue){
-            lowest_residue = current_residue;
+        if (residue1 < lowest_residue){
+            lowest_residue = residue1;
+            sol = s1;
         }
         else {
-            float p = exp(-(current_residue - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
+            float p = exp(-(residue1 - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
 
             // this isn't TRULY random but close enough?
             if (static_cast <float> (rand()) / static_cast <float> (RAND_MAX) <= p) // https://stackoverflow.com/questions/686353/random-float-number-generation
             {
-                lowest_residue = current_residue;
+                lowest_residue = residue1;
+                sol = s1;
             }
         }
+        ll residue2;
+        if (pp){
+            residue2 = calc_residue_PP(input, sol);
+        }
+        else{
+            residue2 = calc_residue(input, sol);
+        } 
         // if residue(S) < residue(S′′) then S′′ = S
-        if (current_residue < lowest_residue){
-            lowest_residue = current_residue;
+        if (lowest_residue < residue2){
+            lowest_residue = residue2;
+            s2 = sol;
         }
     }
 
