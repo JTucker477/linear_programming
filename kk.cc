@@ -171,26 +171,49 @@ array <ll, 100 > random_solution_PP(){
 
 
 // REPEATED RANDOM
-ll repeated_random (array <ll , 100> input){
-    ll final; 
-    
-    array <ll , 100> solution = random_solution();
-    ll lowest_residue = calc_residue(input, solution);
+ll repeated_random (array <ll , 100> input, bool pp){
+
+    array <ll , 100> solution;
+    if (pp){
+        solution = random_solution_PP();
+    }
+    else{
+        solution = random_solution();
+    }
+    ll lowest_residue;
+
+    if (pp){
+        lowest_residue = calc_residue_PP(input, solution);
+    }
+    else{
+        lowest_residue = calc_residue(input, solution);
+    }
+ 
     for (int j = 0; j < max_iter ; j ++ ){
 
         // Try a new random solution
-        array <ll , 100> new_sol = random_solution();
-    
-        ll current_residue = calc_residue(input, new_sol);
+        array <ll , 100> new_sol;
+        if (pp){
+            new_sol = random_solution_PP();
+        }
+        else{
+            new_sol  = random_solution();
+        } 
+        ll current_residue; 
+        if (pp){
+            current_residue = calc_residue_PP(input, solution);
+        }
+        else{
+            current_residue = calc_residue(input, solution);
+        }
+
 
         if (current_residue < lowest_residue){
 
             lowest_residue = current_residue;
         }
     }
-    final = lowest_residue;
-    
-    return final; 
+    return lowest_residue; 
 }
 
 // RANDOM NEIGHBOR GENERATION STANDARD
@@ -258,49 +281,92 @@ array <ll, 100 > random_neighbor_pp(array <ll , 100> sol){
     // While there is a neighbor y in N(x) with f(y) < f(x), set x to y and continue
     // return final solution
     // how to prevent getting stuck in local optima?
-
-ll hill_climb (array <ll , 100> input){
+// pp = true if pp
+ll hill_climb (array <ll , 100> input, bool pp){
     //Start with a random solution S
-   
-    ll final; 
+
     // For each of the 100 instances of the problem
     // ?? is the transform i's different?
-
-    array <ll , 100> solution = random_solution();
-
-    ll lowest_residue = calc_residue(input, solution);
+    array <ll , 100> solution;
+    if(pp){
+        solution = random_solution();
+    }
+    else{
+        solution = random_solution_PP();
+    }
+    ll lowest_residue;
+    if(pp){
+        lowest_residue = calc_residue_PP(input, solution);
+    }
+    else{
+        lowest_residue = calc_residue(input, solution);
+    } 
 
     for (int j = 0; j < max_iter ; j ++ ){
         // Try a new random solution
-        array <ll , 100> new_sol = random_neighbor(solution);
+        array <ll , 100> new_sol;
+        if (pp){
+            new_sol = random_neighbor_pp(solution);
+        }
+        else{
+            new_sol = random_neighbor(solution);
+        }
+         
 
-        ll current_residue = calc_residue(input, new_sol);
+        ll current_residue;
+        if (pp){
+            current_residue = calc_residue_PP(input, new_sol);
+        }
+        else{
+            current_residue = calc_residue(input, new_sol);
+        }
+        ;
 
         if (current_residue < lowest_residue){
-    
             lowest_residue = current_residue;
         }
     }
 
-    final = lowest_residue;
-    
-    return final; 
+    return lowest_residue; 
 }
 
 //  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
-ll sim_anneal (array <ll , 100> input){
+ll sim_anneal (array <ll , 100> input, bool pp){
     //Start with a random solution S
    
-    ll final; 
-    array <ll , 100> solution = random_solution();
+    array <ll , 100> solution;
+    if (pp){
+        solution = random_solution_PP();
+    }
+    else{
+        solution = random_solution();
+    } 
 
-    ll lowest_residue = calc_residue(input, solution);
+    ll lowest_residue;
+    if (pp){
+        lowest_residue = calc_residue_PP(input, solution);
+    } 
+    else{
+        lowest_residue = calc_residue(input, solution);
+    }
 
     for (int j = 0; j < max_iter ; j ++ ){
         // Try a new random solution
-        array <ll , 100> new_sol = random_neighbor(solution);
+        array <ll , 100> new_sol;
+        if (pp){
+            new_sol = random_neighbor_pp(solution);
+        }
+        else{
+            new_sol = random_neighbor(solution);
+        } 
 
-        ll current_residue = calc_residue(input, new_sol);
+        ll current_residue;
+        if (pp){
+            current_residue = calc_residue_PP(input, new_sol);
+        }
+        else{
+            current_residue = calc_residue(input, new_sol);
+        } 
 
         if (current_residue < lowest_residue){
             lowest_residue = current_residue;
@@ -319,9 +385,8 @@ ll sim_anneal (array <ll , 100> input){
             lowest_residue = current_residue;
         }
     }
-    final = lowest_residue;
-    
-    return final; 
+
+    return lowest_residue; 
 }
 
 
@@ -353,6 +418,13 @@ int main(int argc, char *argv[]){
 
     srand(time(NULL));
 
+
+    array< array<ll, 100>, 100> chicken = rand_array();
+    // ll answer1 = repeated_random(chicken[0]);
+    // ll answer2 = hill_climb(chicken[0]);
+    // ll answer3 = sim_anneal(chicken[0]);
+    // printf("repeated random: %lld, hill climb: %lld %lld\n", answer1, answer2, answer3);
+
     // if (argc != 2) {
     //     cerr << "Usage: ./kk inputfile\n";
     //     exit(1);
@@ -376,13 +448,10 @@ int main(int argc, char *argv[]){
 
     
 
-    array <ll , 100> chicken  = {10,8,7,6,5};
-    array <ll , 100> P = {1,2,2,4,5};
-
- 
-
-    ll answer = calc_residue_PP(chicken, P);
-    printf("answer: %lld\n", answer);
+    // array <ll , 100> chicken  = {10,8,7,6,5};
+    // array <ll , 100> P = {1,2,2,4,5};
+    // ll answer = calc_residue_PP(chicken, P);
+    // printf("answer: %lld\n", answer);
 
     // array <ll , 100> final1 = repeated_random(chicken);
     // array <ll , 100> final2 = hill_climb(chicken);
