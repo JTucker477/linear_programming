@@ -312,7 +312,6 @@ ll hill_climb (array <ll , 100> input, bool pp){
             new_sol = random_neighbor(solution);
         }
          
-
         ll current_residue;
         if (pp){
             current_residue = calc_residue_PP(input, new_sol);
@@ -323,6 +322,7 @@ ll hill_climb (array <ll , 100> input, bool pp){
         ;
 
         if (current_residue < lowest_residue){
+            solution = new_sol; 
             lowest_residue = current_residue;
         }
     }
