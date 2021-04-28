@@ -53,7 +53,7 @@ array<array <ll , 100>,100> rand_array(){
 
 ll karmarkar(array <ll , 100> input){
 
-    ll final_residue ;
+    ll final_residue = -1;
     
     ll current_distance;
     int numby = 0;
@@ -419,7 +419,7 @@ int main(int argc, char *argv[]){
     srand(time(NULL));
 
 
-    array< array<ll, 100>, 100> chicken = rand_array();
+    // array< array<ll, 100>, 100> chicken = rand_array();
     // ll answer1 = repeated_random(chicken[0]);
     // ll answer2 = hill_climb(chicken[0]);
     // ll answer3 = sim_anneal(chicken[0]);
@@ -450,8 +450,14 @@ int main(int argc, char *argv[]){
 
     // array <ll , 100> chicken  = {10,8,7,6,5};
     // array <ll , 100> P = {1,2,2,4,5};
-    // ll answer = calc_residue_PP(chicken, P);
+    // ll answer = calc_residue(chicken, P);
     // printf("answer: %lld\n", answer);
+
+    array <ll , 100> chicken  = {10,8,7,6,5};
+    array <ll , 100> P = {1,-1,1,-1,1};
+    // 10 - 8 + 7 - 6 + 5
+    ll answer = calc_residue(chicken, P);
+    printf("answer: %lld\n", answer);
 
     // array <ll , 100> final1 = repeated_random(chicken);
     // array <ll , 100> final2 = hill_climb(chicken);

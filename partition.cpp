@@ -1,3 +1,14 @@
+// passes: karmakar, repeated rand standard, sim anneal PP, hill climb PP
+// FAILS
+    // hill climb standard: 2
+        // These numbers look way too low.
+    // sim anneal standard: 3
+        // These numbers look way too low.
+// (^check rand neighbor - i think its fine, check calc residue standard)
+    // repeated random pp: 11
+        // These numbers seem high
+// ^????
+
 #include <stdio.h>
 #include <algorithm>
 #include <array>
@@ -16,6 +27,9 @@ using namespace std;
 using namespace std::chrono;
 int max_iter = 25000; 
 typedef long long ll;
+
+// You will run experiments on sets of 100 integers, with each integer being a random number chosen uniformly from the range [1,1012].
+
 
 // Returns std array that has a 100 instances of 100 random numbers to input into our algorithms 
 
@@ -157,26 +171,49 @@ array <ll, 100 > random_solution_PP(){
 
 
 // REPEATED RANDOM
-ll repeated_random (array <ll , 100> input){
-    ll final = -1; 
-    
-    array <ll , 100> solution = random_solution();
-    ll lowest_residue = calc_residue(input, solution);
+ll repeated_random (array <ll , 100> input, bool pp){
+
+    array <ll , 100> solution;
+    if (pp){
+        solution = random_solution_PP();
+    }
+    else{
+        solution = random_solution();
+    }
+    ll lowest_residue;
+
+    if (pp){
+        lowest_residue = calc_residue_PP(input, solution);
+    }
+    else{
+        lowest_residue = calc_residue(input, solution);
+    }
+ 
     for (int j = 0; j < max_iter ; j ++ ){
 
         // Try a new random solution
-        array <ll , 100> new_sol = random_solution();
-    
-        ll current_residue = calc_residue(input, new_sol);
+        array <ll , 100> new_sol;
+        if (pp){
+            new_sol = random_solution_PP();
+        }
+        else{
+            new_sol  = random_solution();
+        } 
+        ll current_residue; 
+        if (pp){
+            current_residue = calc_residue_PP(input, solution);
+        }
+        else{
+            current_residue = calc_residue(input, solution);
+        }
+
 
         if (current_residue < lowest_residue){
 
             lowest_residue = current_residue;
         }
     }
-    final = lowest_residue;
-    
-    return final; 
+    return lowest_residue; 
 }
 
 // RANDOM NEIGHBOR GENERATION STANDARD
@@ -189,12 +226,12 @@ ll repeated_random (array <ll , 100> input){
 array <ll, 100 > random_neighbor(array <ll , 100> sol){
 
     array <ll , 100> rand_neighbor = sol;
-    int rand_i = rand() % (rand_neighbor.size() - 1);
-    int rand_j = rand() % (rand_neighbor.size() - 1);
+    int rand_i = rand() % 100; // exclusive?
+    int rand_j = rand() % 100;
     // makes sure i != j
 
     while(rand_i == rand_j){
-        rand_j = rand() % (rand_neighbor.size() - 1);
+        rand_j = rand() % 100;
     }
 
     // perform a random move on the current solution to get a random neighbor
@@ -244,49 +281,92 @@ array <ll, 100 > random_neighbor_pp(array <ll , 100> sol){
     // While there is a neighbor y in N(x) with f(y) < f(x), set x to y and continue
     // return final solution
     // how to prevent getting stuck in local optima?
-
-ll hill_climb (array <ll , 100> input){
+// pp = true if pp
+ll hill_climb (array <ll , 100> input, bool pp){
     //Start with a random solution S
-   
-    ll final = -1; 
+
     // For each of the 100 instances of the problem
     // ?? is the transform i's different?
-
-    array <ll , 100> solution = random_solution();
-
-    ll lowest_residue = calc_residue(input, solution);
+    array <ll , 100> solution;
+    if(pp){
+        solution = random_solution_PP();
+    }
+    else{
+        solution = random_solution();
+    }
+    ll lowest_residue;
+    if(pp){
+        lowest_residue = calc_residue_PP(input, solution);
+    }
+    else{
+        lowest_residue = calc_residue(input, solution);
+    } 
 
     for (int j = 0; j < max_iter ; j ++ ){
         // Try a new random solution
-        array <ll , 100> new_sol = random_neighbor(solution);
+        array <ll , 100> new_sol;
+        if (pp){
+            new_sol = random_neighbor_pp(solution);
+        }
+        else{
+            new_sol = random_neighbor(solution);
+        }
+         
 
-        ll current_residue = calc_residue(input, new_sol);
+        ll current_residue;
+        if (pp){
+            current_residue = calc_residue_PP(input, new_sol);
+        }
+        else{
+            current_residue = calc_residue(input, new_sol);
+        }
+        ;
 
         if (current_residue < lowest_residue){
-    
             lowest_residue = current_residue;
         }
     }
 
-    final = lowest_residue;
-    
-    return final; 
+    return lowest_residue; 
 }
 
 //  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
-ll sim_anneal (array <ll , 100> input){
+ll sim_anneal (array <ll , 100> input, bool pp){
     //Start with a random solution S
    
-    ll final = -1; 
-    array <ll , 100> solution = random_solution();
+    array <ll , 100> solution;
+    if (pp){
+        solution = random_solution_PP();
+    }
+    else{
+        solution = random_solution();
+    } 
 
-    ll lowest_residue = calc_residue(input, solution);
+    ll lowest_residue;
+    if (pp){
+        lowest_residue = calc_residue_PP(input, solution);
+    } 
+    else{
+        lowest_residue = calc_residue(input, solution);
+    }
 
     for (int j = 0; j < max_iter ; j ++ ){
         // Try a new random solution
-        array <ll , 100> new_sol = random_neighbor(solution);
+        array <ll , 100> new_sol;
+        if (pp){
+            new_sol = random_neighbor_pp(solution);
+        }
+        else{
+            new_sol = random_neighbor(solution);
+        } 
 
-        ll current_residue = calc_residue(input, new_sol);
+        ll current_residue;
+        if (pp){
+            current_residue = calc_residue_PP(input, new_sol);
+        }
+        else{
+            current_residue = calc_residue(input, new_sol);
+        } 
 
         if (current_residue < lowest_residue){
             lowest_residue = current_residue;
@@ -305,9 +385,8 @@ ll sim_anneal (array <ll , 100> input){
             lowest_residue = current_residue;
         }
     }
-    final = lowest_residue;
-    
-    return final; 
+
+    return lowest_residue; 
 }
 
 
@@ -336,7 +415,7 @@ int main(int argc, char *argv[]){
     
     f.close();
 
-    int alg = atoi(argv[3]);
+    int alg = atoi(argv[2]);
     if (alg == 0)
     {
         ll output = karmarkar(input);
@@ -344,32 +423,32 @@ int main(int argc, char *argv[]){
     }
     else if (alg == 1)
     {
-        ll output = repeated_random(input);
+        ll output = repeated_random(input, false);
         cout << output;
     }
     else if (alg == 2)
     {
-        ll output = hill_climb(input);
+        ll output = hill_climb(input, false);
         cout << output;
     }
     else if (alg == 3)
     {
-        ll output = sim_anneal(input);
+        ll output = sim_anneal(input, false);
         cout << output;
     }
     else if (alg == 11)
     {
-        ll output = repeated_random(input);
+        ll output = repeated_random(input, true);
         cout << output;
     }
     else if (alg == 12)
     {
-        ll output = hill_climb(input);
+        ll output = hill_climb(input, true);
         cout << output;
     }
     else if (alg == 13)
     {
-        ll output = sim_anneal(input);
+        ll output = sim_anneal(input, true);
         cout << output;
     }
 
