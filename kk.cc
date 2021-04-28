@@ -9,6 +9,7 @@
 #include <cstdlib>
 #include <tuple>
 #include <numeric>
+#include <functional>
 using namespace std;
 int max_iter = 1; 
 typedef long long ll;
@@ -233,7 +234,7 @@ array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     for (int i = 0; i < 1; i++){
         array <ll , 100> solution = random_solution();
         ll lowest_residue;
-        // John's approach
+        // John's approach (FIXXX)
         array <ll , 100> multiply_result = solution; 
         // element wise multiplication of input Result is stored in multiply_result. input is unchanged
         transform( input[i].begin(), input[i].end(),
@@ -275,7 +276,7 @@ array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
     for (int i = 0; i < 1; i++){
         array <ll , 100> solution = random_solution();
         ll lowest_residue;
-        // John's approach
+        // John's approach (FIXXX)
         array <ll , 100> multiply_result = solution; 
         // element wise multiplication of input Result is stored in multiply_result. input is unchanged
         transform( input[i].begin(), input[i].end(),
@@ -283,7 +284,7 @@ array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
                     std::multiplies<int>() );
         lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
 
-        for (int i = 0; i < max_iter ; i ++ ){  
+        for (int j = 0; j < max_iter ; j ++ ){  
             // get a random neighbor
             array <ll , 100> neighbor = random_neighbor(solution);
 
@@ -302,9 +303,16 @@ array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
                 lowest_residue = current_residue;
             }
             else {
-                //  S = S′ with probability exp(−(res(S′)-res(S))/T(iter))
+                //  S = S′ with probability exp(−(res(S′)-res(S))/T(iter)
+                // pow(10,10) * pow((0.8),floor(j / 300))
+                // T(iter) = 1010(0.8)⌊iter/300⌋ for numbers in the range [1,1012]
+                exp(-(current_residue - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
             }
             // if residue(S) < residue(S′′) then S′′ = S
+            if (current_residue < lowest_residue){
+                lowest_residue = current_residue;
+            }
+            
         }
         final[i] = lowest_residue;
     }
