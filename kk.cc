@@ -221,81 +221,45 @@ array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     return final; 
 }
 
-
-
-
 //  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
-
-// array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
-//     //Start with a random solution S
-//     array <ll , 100> final;
-
-//     // For each of the 100 instances of the problem
-//     for (int i = 0; i < 1; i++){
-//         array <ll , 100> solution = random_solution();
-//         ll lowest_residue;
-//         // John's approach (FIXXX)
-//         array <ll , 100> multiply_result = solution; 
-//         // element wise multiplication of input Result is stored in multiply_result. input is unchanged
-//         transform( input[i].begin(), input[i].end(),
-//                     multiply_result.begin(), multiply_result.end(),  
-//                     std::multiplies<int>() );
-//         lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
-
-//         for (int j = 0; j < max_iter ; j ++ ){  
-//             // get a random neighbor
-//             array <ll , 100> neighbor = random_neighbor(solution);
-
-//             // Find residue result 
-//             array <ll , 100> temp_multiply_result;
-//             temp_multiply_result = neighbor;
-
-//             transform( input[i].begin(), input[i].end(),
-//                     temp_multiply_result.begin(), temp_multiply_result.end(),  
-//                     std::multiplies<int>() );
-
-//             // printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
-            
-//             ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
-//             if (current_residue < lowest_residue){
-//                 lowest_residue = current_residue;
-//             }
-//             else {
-//                 //  S = S′ with probability exp(−(res(S′)-res(S))/T(iter)
-//                 // pow(10,10) * pow((0.8),floor(j / 300))
-//                 // T(iter) = 1010(0.8)⌊iter/300⌋ for numbers in the range [1,1012]
-//                 exp(-(current_residue - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
-//             }
-//             // if residue(S) < residue(S′′) then S′′ = S
-//             if (current_residue < lowest_residue){
-//                 lowest_residue = current_residue;
-//             }
-            
-//         }
-//         final[i] = lowest_residue;
-//     }
-//     return final; 
-// }
-
-// int sim_anneal(vector <unsigned long long> A, int iterations) {
-//     vector <unsigned long long> result;
-//     // unsigned long long residue;
-//     for (int i = 0; i < iterations; i++)
-//     {
-//         // 
-//         // find random neighbor 
-//         // residuecomp
-//         if () {
-//             // set residue
-//         }
-//         else if (/*rand*/){
-
-//         }
-//         // choose the best res, min
-//     }
+array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
+    //Start with a random solution S
+   
+    array <ll , 100> final; 
     
-//     return //best res
-// }
+    // For each of the 100 instances of the problem
+    for (int i = 0; i < 1; i++){
+        array <ll , 100> solution = random_solution();
+
+        ll lowest_residue = calc_residue(input[i], solution);
+    
+        for (int j = 0; j < max_iter ; j ++ ){
+            // Try a new random solution
+            array <ll , 100> new_sol = random_neighbor(solution);
+
+            ll current_residue = calc_residue(input[i], new_sol);
+
+            if (current_residue < lowest_residue){
+                lowest_residue = current_residue;
+            }
+            else {
+                float p = exp(-(current_residue - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
+
+                // this isn't TRULY random but close enough?
+                if (static_cast <float> (rand()) / static_cast <float> (RAND_MAX) <= p) // https://stackoverflow.com/questions/686353/random-float-number-generation
+                {
+                    lowest_residue = current_residue;
+                }
+            }
+            // if residue(S) < residue(S′′) then S′′ = S
+            if (current_residue < lowest_residue){
+                lowest_residue = current_residue;
+            }
+        }
+        final[i] = lowest_residue;
+    }
+    return final; 
+}
 
 
 int main(){
@@ -305,8 +269,10 @@ int main(){
 
     array <ll , 100> final1 = repeated_random(chicken);
     array <ll , 100> final2 = hill_climb(chicken);
+    array <ll , 100> final3 = sim_anneal(chicken);
     printf("result1: %lld %lld \n", final1[0], final1[1]);
-     printf("result2: %lld %lld \n", final2[0], final2[1]);
+    printf("result2: %lld %lld \n", final2[0], final2[1]);
+    printf("result3: %lld %lld \n", final3[0], final3[1]);
 } 
 
 
@@ -320,7 +286,7 @@ int main(){
 
 
 
-
+// ARCHIVE
 
 
 
