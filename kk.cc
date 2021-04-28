@@ -11,7 +11,7 @@
 #include <numeric>
 #include <functional>
 using namespace std;
-int max_iter = 1; 
+int max_iter = 25000; 
 typedef long long ll;
 
 // Returns std array that has a 100 instances of 100 random numbers to input into our algorithms 
@@ -27,39 +27,14 @@ array<array <ll , 100>,100> rand_array(){
 
         for (int i = 0; i < 100; i++) {
             temp[i] = distribution(generator) ;
-         
         }
         final[j] = temp;
     }
+    return final;
 
 }
 
-// array<array <ll , 100>,100> rand_array(){
-
-//     int size = 100;
-
-//     array <array <ll, 100>,100> final;
-
-//     // https://stackoverflow.com/questions/37396278/how-to-generate-very-large-random-number-in-c/37397139
-
-//     /* Seed */
-//     random_device rd;
-
-//     /* Random number generator */
-//     // std::default_random_engine generator(rd())
-
-//     /* Distribution on which to apply the generator */
-//     // std::uniform_int_distribution<long long > distribution(1,pow(10,12));
-
-
-
-  
- 
-//     return final;
-// }
 array <ll , 100> karmarkar(array<array <ll , 100>,100> input){
-
-
 
     array <ll , 100> final_residues ;
     
@@ -115,21 +90,23 @@ array <ll , 100> karmarkar(array<array <ll , 100>,100> input){
 
 // John can you do this?
 //RESIDUE FUNCTION
-// ll calc_residue(array<ll , 100> input){
-//     array <ll , 100> multiply_result = input;
-//     ll lowest_residue;
-//         transform(input[i].begin(), input[i].end(),
-//                 multiply_result.begin(), multiply_result.end(),  
-//                 std::multiplies<int>() );
-//         lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
-// }
+
+
+ll calc_residue(array<ll , 100> input, array<ll , 100> solution){
+
+    array<ll , 100> multiply_result = solution; 
+
+    transform(input.begin(), input.end(),
+            solution.begin(), multiply_result.begin(),  
+            std::multiplies<ll>() );
+        
+    return abs(accumulate(begin(multiply_result), end(multiply_result),0));
+}
 
 
 array <ll, 100 > random_solution(){
-    // array <ll , 100> s1;
-    // array <ll , 100> s2;
-    array <ll, 100> sol;
 
+    array <ll, 100> sol;
     // add elements to random subset
     for (int i = 0; i < 100; i++)
     {
@@ -151,35 +128,21 @@ array <ll , 100> repeated_random (array<array <ll , 100>,100> input){
     // For each of the 100 instances of the problem
     // ?? is the transform i's different?
     for (int i = 0; i < 1; i++){
-        array <ll , 100> solution;
-        array <ll , 100> multiply_result;
-        solution = random_solution();
-        multiply_result = solution; 
-        ll lowest_residue;
-        // element wise multiplication of input Result is stored in multiply_result. input is unchanged
-        transform( input[i].begin(), input[i].end(),
-                    multiply_result.begin(), multiply_result.end(),  
-                    std::multiplies<int>() );
-        lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
 
-        // The actual iteration 
-        for (int i = 0; i < max_iter ; i ++ ){
-            
-           
+        array <ll , 100> solution = random_solution();
+
+        ll lowest_residue = calc_residue(input[i], solution);
+
+ 
+        for (int j = 0; j < max_iter ; j ++ ){
+
             // Try a new random solution
             array <ll , 100> new_sol = random_solution();
-            array <ll , 100> temp_multiply_result;
-            temp_multiply_result = new_sol;
-            // Find residue result 
-            transform( input[i].begin(), input[i].end(),
-                    temp_multiply_result.begin(), temp_multiply_result.end(),  
-                    std::multiplies<int>() );
-
-            printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
-            
-            ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
-
+        
+            ll current_residue = calc_residue(input[i], new_sol);
+ 
             if (current_residue < lowest_residue){
+    
                 lowest_residue = current_residue;
             }
         }
@@ -198,13 +161,16 @@ array <ll , 100> repeated_random (array<array <ll , 100>,100> input){
         // then moving from S to a neighbor is accomplished either by
             // moving one or two elements from A1 to A2, or moving one or two elements from A2 to A1
 array <ll, 100 > random_neighbor(array <ll , 100> sol){
+
     array <ll , 100> rand_neighbor = sol;
     int rand_i = rand() % (rand_neighbor.size() - 1);
-    int rand_j;
+    int rand_j = rand() % (rand_neighbor.size() - 1);
     // makes sure i != j
-    do {
-        int rand_j = rand() % (rand_neighbor.size() - 1);
-    } while (rand_i != rand_j);
+
+    while(rand_i == rand_j){
+        rand_j = rand() % (rand_neighbor.size() - 1);
+    }
+
     // perform a random move on the current solution to get a random neighbor
     // set s_i to - s_i
     rand_neighbor[rand_i] = -sol[rand_i];
@@ -228,96 +194,88 @@ array <ll, 100 > random_neighbor(array <ll , 100> sol){
 
 array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     //Start with a random solution S
-    array <ll , 100> final;
-
+   
+    array <ll , 100> final; 
+    
     // For each of the 100 instances of the problem
+    // ?? is the transform i's different?
     for (int i = 0; i < 1; i++){
         array <ll , 100> solution = random_solution();
-        ll lowest_residue;
-        // John's approach (FIXXX)
-        array <ll , 100> multiply_result = solution; 
-        // element wise multiplication of input Result is stored in multiply_result. input is unchanged
-        transform( input[i].begin(), input[i].end(),
-                    multiply_result.begin(), multiply_result.end(),  
-                    std::multiplies<int>() );
-        lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
 
-        for (int i = 0; i < max_iter ; i ++ ){  
-            // get a random neighbor
-            array <ll , 100> neighbor = random_neighbor(solution);
+        ll lowest_residue = calc_residue(input[i], solution);
+    
+        for (int j = 0; j < max_iter ; j ++ ){
+            // Try a new random solution
+            array <ll , 100> new_sol = random_neighbor(solution);
 
-            // Find residue result 
-            array <ll , 100> temp_multiply_result;
-            temp_multiply_result = neighbor;
+            ll current_residue = calc_residue(input[i], new_sol);
 
-            transform( input[i].begin(), input[i].end(),
-                    temp_multiply_result.begin(), temp_multiply_result.end(),  
-                    std::multiplies<int>() );
-
-            // printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
-            
-            ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
             if (current_residue < lowest_residue){
+        
                 lowest_residue = current_residue;
             }
         }
+
         final[i] = lowest_residue;
     }
     return final; 
 }
+
+
+
 
 //  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
 
-array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
-    //Start with a random solution S
-    array <ll , 100> final;
+// array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
+//     //Start with a random solution S
+//     array <ll , 100> final;
 
-    // For each of the 100 instances of the problem
-    for (int i = 0; i < 1; i++){
-        array <ll , 100> solution = random_solution();
-        ll lowest_residue;
-        // John's approach (FIXXX)
-        array <ll , 100> multiply_result = solution; 
-        // element wise multiplication of input Result is stored in multiply_result. input is unchanged
-        transform( input[i].begin(), input[i].end(),
-                    multiply_result.begin(), multiply_result.end(),  
-                    std::multiplies<int>() );
-        lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
+//     // For each of the 100 instances of the problem
+//     for (int i = 0; i < 1; i++){
+//         array <ll , 100> solution = random_solution();
+//         ll lowest_residue;
+//         // John's approach (FIXXX)
+//         array <ll , 100> multiply_result = solution; 
+//         // element wise multiplication of input Result is stored in multiply_result. input is unchanged
+//         transform( input[i].begin(), input[i].end(),
+//                     multiply_result.begin(), multiply_result.end(),  
+//                     std::multiplies<int>() );
+//         lowest_residue = accumulate(begin(multiply_result), end(multiply_result),0);
 
-        for (int j = 0; j < max_iter ; j ++ ){  
-            // get a random neighbor
-            array <ll , 100> neighbor = random_neighbor(solution);
+//         for (int j = 0; j < max_iter ; j ++ ){  
+//             // get a random neighbor
+//             array <ll , 100> neighbor = random_neighbor(solution);
 
-            // Find residue result 
-            array <ll , 100> temp_multiply_result;
-            temp_multiply_result = neighbor;
+//             // Find residue result 
+//             array <ll , 100> temp_multiply_result;
+//             temp_multiply_result = neighbor;
 
-            transform( input[i].begin(), input[i].end(),
-                    temp_multiply_result.begin(), temp_multiply_result.end(),  
-                    std::multiplies<int>() );
+//             transform( input[i].begin(), input[i].end(),
+//                     temp_multiply_result.begin(), temp_multiply_result.end(),  
+//                     std::multiplies<int>() );
 
-            // printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
+//             // printf("temp_multiply_result[0] %lld\n",temp_multiply_result[0] );
             
-            ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
-            if (current_residue < lowest_residue){
-                lowest_residue = current_residue;
-            }
-            else {
-                //  S = S′ with probability exp(−(res(S′)-res(S))/T(iter)
-                // pow(10,10) * pow((0.8),floor(j / 300))
-                // T(iter) = 1010(0.8)⌊iter/300⌋ for numbers in the range [1,1012]
-                exp(-(current_residue - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
-            }
-            // if residue(S) < residue(S′′) then S′′ = S
-            if (current_residue < lowest_residue){
-                lowest_residue = current_residue;
-            }
+//             ll current_residue = accumulate(begin(temp_multiply_result), end(temp_multiply_result),0);
+//             if (current_residue < lowest_residue){
+//                 lowest_residue = current_residue;
+//             }
+//             else {
+//                 //  S = S′ with probability exp(−(res(S′)-res(S))/T(iter)
+//                 // pow(10,10) * pow((0.8),floor(j / 300))
+//                 // T(iter) = 1010(0.8)⌊iter/300⌋ for numbers in the range [1,1012]
+//                 exp(-(current_residue - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
+//             }
+//             // if residue(S) < residue(S′′) then S′′ = S
+//             if (current_residue < lowest_residue){
+//                 lowest_residue = current_residue;
+//             }
             
-        }
-        final[i] = lowest_residue;
-    }
-    return final; 
-}
+//         }
+//         final[i] = lowest_residue;
+//     }
+//     return final; 
+// }
 
 // int sim_anneal(vector <unsigned long long> A, int iterations) {
 //     vector <unsigned long long> result;
@@ -342,21 +300,13 @@ array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
 
 int main(){
     srand(time(NULL));
-    array<array <ll , 100>,100> chicken = rand_array();
-    // karmarkar(chicken);
-    // // for (int i = 0; i < 11; i++){
-    // //     printf("number: %llu\n", chicken[0][i]); 
-    // // }
-    // printf("try her out: %d\n", abs(-9));
-    // array <ll , 100>::iterator first_max;
-    // first_max = max_element(chicken[0].begin(), chicken[0].end());
-    // printf("max: %llu\n", (long long unsigned) *max_element(chicken[0].begin(), chicken[0].end()));
-    array <ll, 100> final;
-    printf("hihihihihi\n");
-    final = repeated_random(chicken);
 
-    printf("hey girl\n");
-    printf("result: %lld \n", final[0]);
+    array<array <ll , 100>,100> chicken = rand_array();
+
+    array <ll , 100> final1 = repeated_random(chicken);
+    array <ll , 100> final2 = hill_climb(chicken);
+    printf("result1: %lld %lld \n", final1[0], final1[1]);
+     printf("result2: %lld %lld \n", final2[0], final2[1]);
 } 
 
 
@@ -443,3 +393,28 @@ int main(){
 
 // }
 
+
+
+// array<array <ll , 100>,100> rand_array(){
+
+//     int size = 100;
+
+//     array <array <ll, 100>,100> final;
+
+//     // https://stackoverflow.com/questions/37396278/how-to-generate-very-large-random-number-in-c/37397139
+
+//     /* Seed */
+//     random_device rd;
+
+//     /* Random number generator */
+//     // std::default_random_engine generator(rd())
+
+//     /* Distribution on which to apply the generator */
+//     // std::uniform_int_distribution<long long > distribution(1,pow(10,12));
+
+
+
+  
+ 
+//     return final;
+// }
