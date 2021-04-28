@@ -1,3 +1,14 @@
+// TODO
+// - [o] pre-partition
+//      - [X] random solution
+//      - [X] random neighbor
+//      - [o] calc residue
+// - [o] file input
+// - [o] collect data
+//      - [o] time
+//      - [o] take the average of final 100 residue instances
+// - [o] writeup
+
 #include <stdio.h>
 #include <algorithm>
 #include <array>
@@ -13,6 +24,9 @@
 using namespace std;
 int max_iter = 25000; 
 typedef long long ll;
+
+// You will run experiments on sets of 100 integers, with each integer being a random number chosen uniformly from the range [1,1012].
+
 
 // Returns std array that has a 100 instances of 100 random numbers to input into our algorithms 
 
@@ -88,10 +102,8 @@ array <ll , 100> karmarkar(array<array <ll , 100>,100> input){
 
 }   
 
-// John can you do this?
-//RESIDUE FUNCTION
 
-
+//RESIDUE FUNCTION STANDARD
 ll calc_residue(array<ll , 100> input, array<ll , 100> solution){
 
     array<ll , 100> multiply_result = solution; 
@@ -103,7 +115,12 @@ ll calc_residue(array<ll , 100> input, array<ll , 100> solution){
     return abs(accumulate(begin(multiply_result), end(multiply_result),0));
 }
 
+//RESIDUE FUNCTION PREPARTITION
+// ll calc_residue(array<ll , 100> input, array<ll , 100> solution){
 
+// }
+
+// RANDOM SOLUTION STANDARD
 array <ll, 100 > random_solution(){
 
     array <ll, 100> sol;
@@ -122,12 +139,26 @@ array <ll, 100 > random_solution(){
     return sol;
 }
 
+//RANDOM SOLUTION PREPARTITION
+// A random solution can be obtained by generating a sequence of n values in the range [1,n] 
+// and using this for P. 
+array <ll, 100 > random_solution_PP(){
+    array <ll, 100> sol;
+
+    for (int i = 0; i < 100; i++)
+    {
+        sol[i] = rand() % 100; // random number [0,100] (double check to see if this is inculsive?)
+    }
+    return sol;
+}
+
+
+// REPEATED RANDOM
 array <ll , 100> repeated_random (array<array <ll , 100>,100> input){
     array <ll , 100> final; 
     
     // For each of the 100 instances of the problem
-    // ?? is the transform i's different?
-    for (int i = 0; i < 1; i++){
+    for (int i = 0; i < 100; i++){
 
         array <ll , 100> solution = random_solution();
 
@@ -153,7 +184,7 @@ array <ll , 100> repeated_random (array<array <ll , 100>,100> input){
     return final; 
 }
 
-// RANDOM NEIGHBOR GENERATION
+// RANDOM NEIGHBOR GENERATION STANDARD
     // A random neighbor 
     // Recall: a neighbor of a solution S is the one such that differs from S in 
         // one or two places.
@@ -184,6 +215,35 @@ array <ll, 100 > random_neighbor(array <ll , 100> sol){
     return rand_neighbor;
 }
 
+// RANDOM NEIGHBOR - PREPARTITION
+// Thinking of all possible solutions as a state space, 
+// a natural way to define neighbors of a solution P is as the set of all solutions 
+// that differ from P in just one place. The interpretation is that we change the 
+// prepartitioning by changing which partition one element lies in.
+
+// A random move on this state space can be defined as follows. 
+// Choose two random indices i and j from [1,n] with p_i  != j and set p_i to j.
+array <ll, 100 > random_neighbor_pp(array <ll , 100> sol){
+
+    array <ll , 100> rand_neighbor = sol;
+    // two random indices i and j from [1,n]
+    // make sure p_i != j
+    // set p_i to j
+    int rand_i = rand() % 100;
+    int rand_j = rand() % 100;
+
+    // makes sure p_i != j
+    while(rand_neighbor[rand_i] == rand_j){
+        rand_j = rand() % 100;
+    }
+
+    // perform a random move on the current solution to get a random neighbor
+    // set p_i to j
+    rand_neighbor[rand_i] = rand_j;
+
+    return rand_neighbor;
+}
+
 
 // HILL CLIMBING
  // (from section )
@@ -199,7 +259,7 @@ array <ll , 100> hill_climb (array<array <ll , 100>,100> input){
     
     // For each of the 100 instances of the problem
     // ?? is the transform i's different?
-    for (int i = 0; i < 1; i++){
+    for (int i = 0; i < 100; i++){
         array <ll , 100> solution = random_solution();
 
         ll lowest_residue = calc_residue(input[i], solution);
@@ -228,7 +288,7 @@ array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
     array <ll , 100> final; 
     
     // For each of the 100 instances of the problem
-    for (int i = 0; i < 1; i++){
+    for (int i = 0; i < 100; i++){
         array <ll , 100> solution = random_solution();
 
         ll lowest_residue = calc_residue(input[i], solution);
@@ -270,21 +330,51 @@ int main(){
     array <ll , 100> final1 = repeated_random(chicken);
     array <ll , 100> final2 = hill_climb(chicken);
     array <ll , 100> final3 = sim_anneal(chicken);
-    printf("result1: %lld %lld \n", final1[0], final1[1]);
-    printf("result2: %lld %lld \n", final2[0], final2[1]);
-    printf("result3: %lld %lld \n", final3[0], final3[1]);
+    array <ll , 100> kk = karmarkar(chicken);
+    printf("result1: %lld %lld %lld \n", final1[0], final1[1], final1[2]);
+    printf("result2: %lld %lld %lld\n", final2[0], final2[1], final2[2]);
+    printf("result3: %lld %lld %lld\n", final3[0], final3[1], final3[2]);
+    printf("kk: %lld %lld %lld\n", kk[0], kk[1], kk[2]);
 } 
 
 
 
 
+// pluf A' into our alg to find the smallest residue
+
+// we have our standard representation A
+// reset a_i to be thee sum of all values j with p_j = i
+// for example using:
+//      A' = (0,0,...,0)     // initalize to 0
+//      for j = 1 to n
+//          a'_pj = a' pj + aj
+
+// given P
+// array <ll , 100> A_new;
+// for (int j = 1; j < 100; i++)
+// {
+//     A_new[i] = 0;
+// }
+
+// best partition to give the lowest reesidue
+// kk is also another alg that approximates the best partition/lowest calc_residuebut kk also has a diff role:
+    // calculate the residue from a prepartition
+    // 
+
+// calc residue would be using kk
+// random neighbor : pick 2 indices then put them together
 
 
+// currently, standard solution: A = [+1,+1,+1,+1,-1,-1]
+// need prepartition, A': A' = []
+
+// radom solution partitionfunction
+// each element is 
+// every element in P is between 1 and n randomly, where n is 100
 
 
-
-
-
+// change calc residue
+// change random neighbor
 
 // ARCHIVE
 
