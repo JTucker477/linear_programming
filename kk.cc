@@ -3,10 +3,10 @@
 //      - [X] random solution
 //      - [X] random neighbor
 //      - [o] calc residue
-// - [o] file input
+// - [x] file input
 // - [o] collect data
 //      - [o] time
-//      - [o] take the average of final 100 residue instances
+//      - [o] (do this in Google sheets)take the average of final 100 residue instances
 // - [o] writeup
 
 #include <stdio.h>
@@ -21,7 +21,10 @@
 #include <tuple>
 #include <numeric>
 #include <functional>
+#include <fstream>
 using namespace std;
+#include <chrono>
+using namespace std::chrono;
 int max_iter = 25000; 
 typedef long long ll;
 
@@ -322,7 +325,53 @@ array <ll , 100> sim_anneal (array<array <ll , 100>,100> input){
 }
 
 
-int main(){
+// COLLECT DATA - got this format from our strassen
+//      - [o] time
+//      - [o] (we can do this easily in Sheets instead) take the average of final 100 residue instances
+// void collect_data(){
+//     array<array <ll , 100>,100> chicken = rand_array();
+//     std::ofstream file;
+//     file.open("results.csv", std::ios::app);
+
+//     auto start = high_resolution_clock::now();
+
+//     array <ll , 100> final1 = repeated_random(chicken);
+//     // have to do individual timings for these too
+//     // array <ll , 100> final2 = hill_climb(chicken);
+//     // array <ll , 100> final3 = sim_anneal(chicken);
+//     // array <ll , 100> kk = karmarkar(chicken);
+
+//     auto stop = high_resolution_clock::now();
+//     auto duration = duration_cast<nanoseconds>(stop - start);
+//     float time = duration.count();
+//     // file << d << ", " << i <<  ", " << time << "\n";
+//     file.close();
+// }
+
+
+int main(int argc, char *argv[]){
+
+    // if (argc != 2) {
+    //     cerr << "Usage: ./kk inputfile\n";
+    //     exit(1);
+    // }
+
+    // // initialize array
+    // array <ll , 100> input;
+    // // read file
+    // // input file is a file of 100 integers, one on each line
+    // ifstream f;
+    // f.open(argv[1],ios::in);
+    // string entry;
+
+    // for (int i = 0; i < 100; i++)
+    // {
+    //     getline(f, entry);
+    //     input[i] = stoi(entry);
+    // }
+    
+    // f.close();
+
     srand(time(NULL));
 
     array<array <ll , 100>,100> chicken = rand_array();
@@ -336,141 +385,3 @@ int main(){
     printf("result3: %lld %lld %lld\n", final3[0], final3[1], final3[2]);
     printf("kk: %lld %lld %lld\n", kk[0], kk[1], kk[2]);
 } 
-
-
-
-
-// pluf A' into our alg to find the smallest residue
-
-// we have our standard representation A
-// reset a_i to be thee sum of all values j with p_j = i
-// for example using:
-//      A' = (0,0,...,0)     // initalize to 0
-//      for j = 1 to n
-//          a'_pj = a' pj + aj
-
-// given P
-// array <ll , 100> A_new;
-// for (int j = 1; j < 100; i++)
-// {
-//     A_new[i] = 0;
-// }
-
-// best partition to give the lowest reesidue
-// kk is also another alg that approximates the best partition/lowest calc_residuebut kk also has a diff role:
-    // calculate the residue from a prepartition
-    // 
-
-// calc residue would be using kk
-// random neighbor : pick 2 indices then put them together
-
-
-// currently, standard solution: A = [+1,+1,+1,+1,-1,-1]
-// need prepartition, A': A' = []
-
-// radom solution partitionfunction
-// each element is 
-// every element in P is between 1 and n randomly, where n is 100
-
-
-// change calc residue
-// change random neighbor
-
-// ARCHIVE
-
-
-
-// array <int, 3> v1 = {1,2,3};
-//     array <int, 3> v2 = {2,3,4}; 
-//     array <int, 3> v3 = v1;
-//     v2[0] = 0; 
-//     std::transform( v1.begin(), v1.end(),
-//                 v2.begin(), v2.begin(),  // assumes v1,v2 of same size > 1, 
-//                                           //       v one element smaller
-//                 std::multiplies<int>() );
-//     printf("hi %d\n", v1[0]);
-//     printf("hi %d\n", v1[1]);
-//     printf("hi %d\n", v1[2]);
-
-
-// Returns two random subsets of the inputed array. STILL TO DO
-// need to return two sets (return two things!)
-// initialize 
-// each array is at most 100 but should be 
-// test
-// pair<vector <ll >, vector <ll> > two_random_set(array <ll , 100> input){
-//     // array <ll , 100> s1;
-//     // array <ll , 100> s2;
-//     vector <ll> s1;
-//     vector <ll> s2;
-
-//     // add elements to random subset
-//     for (int i = 0; i < 100; i++)
-//     {
-//         if (rand()%2 == 0)
-//         {
-//             s1.push_back(input[i]);
-//         }
-//         // if not in random subset, add to another subset
-//         else {
-//             s2.push_back(input[i]);
-//         }
-//     }
-//     return make_pair(s1,s2);
-// }
-
-// Heuristics
-
-
-// Repeated random: repeatedly generate random solutions to the problem, as determined by the representation.
-// Start with a random solution S for iter = 1 to max iter
-    // S′ = a random solution
-    // if residue(S′) < residue(S) then S = S′ 
-// return S
-
-// repeated random
-// Maybe create two random subsets within
-
-//pseudocode
-// vector a;
-// for (int i = 0; i < 100; i++)
-// {
-//     a.push_back(rand())
-// }
-
-// array <ll , 100> repeated_random(){
-//     // Create random solution
-// }
-
-// John's repeated random:
-
-// pair<vector <ll >, vector <ll> > random_neighbor(pair<vector <ll >, vector <ll> >){
-
-
-// }
-
-
-
-// array<array <ll , 100>,100> rand_array(){
-
-//     int size = 100;
-
-//     array <array <ll, 100>,100> final;
-
-//     // https://stackoverflow.com/questions/37396278/how-to-generate-very-large-random-number-in-c/37397139
-
-//     /* Seed */
-//     random_device rd;
-
-//     /* Random number generator */
-//     // std::default_random_engine generator(rd())
-
-//     /* Distribution on which to apply the generator */
-//     // std::uniform_int_distribution<long long > distribution(1,pow(10,12));
-
-
-
-  
- 
-//     return final;
-// }
