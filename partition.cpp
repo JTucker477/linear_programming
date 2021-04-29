@@ -1,13 +1,3 @@
-
-//NOW
-// FAILS
-    // repeated random standard: 11
-        // These numbers seem high
-    // hill climb standard: 2
-        // These numbers look way too low.
-    // sim anneal standard: 3
-        // These numbers seem high.
-
 #include <stdio.h>
 #include <algorithm>
 #include <array>
@@ -27,28 +17,10 @@ using namespace std::chrono;
 int max_iter = 25000; 
 typedef long long ll;
 
-// You will run experiments on sets of 100 integers, with each integer being a random number chosen uniformly from the range [1,1012].
 
-
-// Returns std array that has a 100 instances of 100 random numbers to input into our algorithms 
-
-array<array <ll , 100>,100> rand_array(){
-    array<array <ll , 100>,100>  final;
-    random_device rand_dev;
-    mt19937 generator(rand_dev());
-    std::uniform_int_distribution<long> distribution(1, pow(10,12));
-
-    for (int j = 0; j < 100; j++ ){
-        array <ll, 100> temp;
-
-        for (int i = 0; i < 100; i++) {
-            temp[i] = distribution(generator) ;
-        }
-        final[j] = temp;
-    }
-    return final;
-
-}
+////////////
+// KARMARKAR-KARP ALGORITHM
+////////////
 
 ll karmarkar(array <ll , 100> input){
 
@@ -64,14 +36,14 @@ ll karmarkar(array <ll , 100> input){
 
         // Find Largest number
         first_max = max_element(input.begin(), input.end());
-        long long unsigned first_max_value = *first_max;
+        ll first_max_value = *first_max;
         int first_max_index = distance(input.begin(), first_max); 
         // I set it to zero so that we can find the second largest number next
         input[first_max_index] = 0;
 
         // Find second largest number
         second_max = max_element(input.begin(), input.end());
-        long long unsigned second_max_value = *second_max;
+        ll second_max_value = *second_max;
         int second_max_index = distance(input.begin(), second_max); 
         input[second_max_index] = 0;
 
@@ -97,23 +69,21 @@ ll karmarkar(array <ll , 100> input){
 }   
 
 
-//RESIDUE FUNCTION STANDARD
+////////////
+// RESIDUE FUNCTION - STANDARD
+////////////
 ll calc_residue(array<ll , 100> input, array<ll , 100> solution){
-
-    array<ll , 100> multiply_result = solution; 
-
-    // transform(input.begin(), input.end(),
-    //         multiply_result.begin(), multiply_result.begin(),  
-    //         std::multiplies<ll>() );
     
     ll sum = 0;
     for (int i =0; i < 100; i++){
         sum += (input[i] * solution[i]);
     }
     return abs(sum);
-    // return abs(accumulate(begin(multiply_result), end(multiply_result),0));
 }
 
+////////////
+// RESIDUE FUNCTION - PP
+////////////
 ll calc_residue_PP(array<ll , 100> A, array<ll , 100> P){
 
     array<ll , 100> final;
@@ -131,17 +101,12 @@ ll calc_residue_PP(array<ll , 100> A, array<ll , 100> P){
         }
         final[i] = sum; 
     }
-
     return karmarkar(final);
 }
 
-
-//RESIDUE FUNCTION PREPARTITION
-// ll calc_residue(array<ll , 100> input, array<ll , 100> solution){
-
-// }
-
-// RANDOM SOLUTION STANDARD
+////////////
+// RANDOM SOLUTION STANDARD (helper)
+////////////
 array <ll, 100 > random_solution(){
 
     array <ll, 100> sol;
@@ -160,21 +125,24 @@ array <ll, 100 > random_solution(){
     return sol;
 }
 
-//RANDOM SOLUTION PREPARTITION
-// A random solution can be obtained by generating a sequence of n values in the range [1,n] 
-// and using this for P. 
+////////////
+// RANDOM SOLUTION PREPARTITION (helper)
+////////////
+
 array <ll, 100 > random_solution_PP(){
     array <ll, 100> sol;
 
     for (int i = 0; i < 100; i++)
     {
-        sol[i] = rand() % 100; // random number [0,100] (double check to see if this is inculsive?)
+        sol[i] = rand() % 100;
     }
     return sol;
 }
 
 
-// REPEATED RANDOM
+////////////
+// REPEATED RANDOM ALGORITHM
+////////////
 ll repeated_random (array <ll , 100> input, bool pp){
 
     // start with a random solution S
@@ -215,7 +183,6 @@ ll repeated_random (array <ll , 100> input, bool pp){
 
         // if residue(S') < residue(S) then s=S'
         if (residueS1 < residueS){
-            // lowest_residue = current_residue;
             S = S1;
         }
     }
@@ -229,13 +196,9 @@ ll repeated_random (array <ll , 100> input, bool pp){
     
 }
 
-// RANDOM NEIGHBOR GENERATION STANDARD
-    // A random neighbor 
-    // Recall: a neighbor of a solution S is the one such that differs from S in 
-        // one or two places.
-        // Aka, if A1 represents +1 and A2 -1 values,
-        // then moving from S to a neighbor is accomplished either by
-            // moving one or two elements from A1 to A2, or moving one or two elements from A2 to A1
+////////////
+// RANDOM NEIGHBOR GENERATION - STANDARD (helper)
+////////////
 array <ll, 100 > random_neighbor(array <ll , 100> sol){
 
     array <ll , 100> rand_neighbor = sol;
@@ -258,20 +221,13 @@ array <ll, 100 > random_neighbor(array <ll , 100> sol){
     return rand_neighbor;
 }
 
-// RANDOM NEIGHBOR - PREPARTITION
-// Thinking of all possible solutions as a state space, 
-// a natural way to define neighbors of a solution P is as the set of all solutions 
-// that differ from P in just one place. The interpretation is that we change the 
-// prepartitioning by changing which partition one element lies in.
-
-// A random move on this state space can be defined as follows. 
-// Choose two random indices i and j from [1,n] with p_i  != j and set p_i to j.
+////////////
+// RANDOM NEIGHBOR - PREPARTITION (helper)
+////////////
 array <ll, 100 > random_neighbor_pp(array <ll , 100> sol){
 
     array <ll , 100> rand_neighbor = sol;
     // two random indices i and j from [1,n]
-    // make sure p_i != j
-    // set p_i to j
     int rand_i = rand() % 100;
     int rand_j = rand() % 100;
 
@@ -287,15 +243,10 @@ array <ll, 100 > random_neighbor_pp(array <ll , 100> sol){
     return rand_neighbor;
 }
 
-
+////////////
 // HILL CLIMBING
- // (from section )
-    // Pick a starting point x
-    // While there is a neighbor y in N(x) with f(y) < f(x), set x to y and continue
-    // return final solution
-    // how to prevent getting stuck in local optima?
-// pp = true if pp
-ll hill_climb (array <ll , 100> input, bool pp){
+////////////
+ll hill_climb (array <ll , 100> input, bool pp){        // pp = true if pp
     //Start with a random solution S
 
     array <ll , 100> S;
@@ -334,7 +285,6 @@ ll hill_climb (array <ll , 100> input, bool pp){
         // if residue(S') < residue(S) then S=S'
         if (residueS1 < residueS){
             S = S1; 
-            // lowest_residue = current_residue;
         }
     }
     if(pp){
@@ -346,7 +296,10 @@ ll hill_climb (array <ll , 100> input, bool pp){
     return residueS; 
 }
 
-//  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
+
+////////////
+// SIMULATED ANNEALING
+////////////
 ll sim_anneal (array <ll , 100> input, bool pp){
     
     //Start with a random solution S
@@ -401,16 +354,13 @@ ll sim_anneal (array <ll , 100> input, bool pp){
                 residueS = calc_residue(input, S);
             }
             float p = exp(-(residueS1 - residueS)/ (pow(10,10) * pow((0.8),floor(j / 300))));
-
-            // this isn't TRULY random but close enough?
+            
             if (static_cast <float> (rand()) / static_cast <float> (RAND_MAX) <= p) // https://stackoverflow.com/questions/686353/random-float-number-generation
             {
-                // lowest_residue = residue1;
                 S = S1;
             }
         }
         // residue (S'')
-        
         if (pp){
             residueS2 = calc_residue_PP(input, S2);
         }
@@ -438,7 +388,35 @@ ll sim_anneal (array <ll , 100> input, bool pp){
     return residueS2; 
 }
 
-// file.open("karmarkar.csv", std::ios::app);
+////////////
+// DATA COLLECTION
+////////////
+
+// Returns std array that has a 100 instances of 100 random numbers to test with
+// array<array <ll , 100>,100> rand_array(){
+//     array<array <ll , 100>,100>  final;
+//     random_device rand_dev;
+//     mt19937 generator(rand_dev());
+//     std::uniform_int_distribution<long> distribution(1, pow(10,12));
+
+//     for (int j = 0; j < 100; j++ ){
+//         array <ll, 100> temp;
+
+//         for (int i = 0; i < 100; i++) {
+//             temp[i] = distribution(generator) ;
+//         }
+//         final[j] = temp;
+//     }
+//     return final;
+// }
+
+// void data_collections(int alg){
+//     std::ofstream file;
+//     array< array< ll, 100>, 100> input = rand_array();
+    
+//     // Karmarkar-Karp
+//     if (alg == 0){
+//         file.open("karmarkar.csv", std::ios::app);
 //         auto start = high_resolution_clock::now();
 //         for (int i = 0 ; i < 100; i ++){
 //             ll answer = karmarkar(input[i]);
@@ -448,205 +426,186 @@ ll sim_anneal (array <ll , 100> input, bool pp){
 //         auto duration = duration_cast<nanoseconds>(stop - start);
 //         float time = duration.count();
 //         file.close();
+//     }
 
-void data_collections(int alg){
-    std::ofstream file;
-    array< array< ll, 100>, 100> input = rand_array();
+//     // Repeated Random
+//     if (alg == 1){
+//         file.open("repeated_random.csv", std::ios::app);
+//         auto start = high_resolution_clock::now();
+//         for (int i = 0 ; i < 100; i ++){
+//             ll answer = repeated_random(input[i], 0 );
+//             file << i << ", " << answer <<  "\n";
+//         }
+//         auto stop = high_resolution_clock::now();
+//         auto duration = duration_cast<nanoseconds>(stop - start);
+//         float time = duration.count();
+//         file.close();
+//     }
+//     // Hill Climbing
+//     if (alg == 2){
+//         file.open("hill.csv", std::ios::app);
+//         auto start = high_resolution_clock::now();
+//         for (int i = 0 ; i < 100; i ++){
+//             ll answer = hill_climb(input[i], 0 );
+//             file << i << ", " << answer <<  "\n";
+//         }
+//         auto stop = high_resolution_clock::now();
+//         auto duration = duration_cast<nanoseconds>(stop - start);
+//         float time = duration.count();
+//         file.close();
+//     }
+//     // Simulated Annealing
+//     if (alg == 3){
+//         file.open("anneal.csv", std::ios::app);
+//         auto start = high_resolution_clock::now();
+//         for (int i = 0 ; i < 100; i ++){
+//             ll answer = sim_anneal(input[i],0);
+//             file << i << ", " << answer <<  "\n";
+//         }
+//         auto stop = high_resolution_clock::now();
+//         auto duration = duration_cast<nanoseconds>(stop - start);
+//         float time = duration.count();
+//         file.close();
+//     }
+//     // Prepartitioned Repeated Random
+//     if (alg == 11){
+//         file.open("repeated_random_pp.csv", std::ios::app);
+//         auto start = high_resolution_clock::now();
+//         for (int i = 0 ; i < 100; i ++){
+//             ll answer = repeated_random(input[i], 1);
+//             file << i << ", " << answer <<  "\n";
+//         }
+//         auto stop = high_resolution_clock::now();
+//         auto duration = duration_cast<nanoseconds>(stop - start);
+//         float time = duration.count();
+//         file.close();
+//     }
+//     // Prepartitioned Hill climbing
+//     if (alg == 12){
+//         file.open("hill_pp.csv", std::ios::app);
+//         auto start = high_resolution_clock::now();
+//         for (int i = 0 ; i < 100; i ++){
+//             ll answer = hill_climb(input[i], 1);
+//             file << i << ", " << answer <<  "\n";
+//         }
+//         auto stop = high_resolution_clock::now();
+//         auto duration = duration_cast<nanoseconds>(stop - start);
+//         float time = duration.count();
+//         file.close();
+//     }
+//     // Prepartitioned Simulated Annealing
+//     if (alg == 13){
+//         file.open("anneal_pp.csv", std::ios::app);
+//         auto start = high_resolution_clock::now();
+//         for (int i = 0 ; i < 100; i ++){
+//             ll answer = sim_anneal(input[i],1);
+//             file << i << ", " << answer <<  "\n";
+//         }
+//         auto stop = high_resolution_clock::now();
+//         auto duration = duration_cast<nanoseconds>(stop - start);
+//         float time = duration.count();
+//         file.close();
+//     }
+// }
+
+
+// void data_collections_time(){
+//     std::ofstream file;
+
+//     file.open("time.csv", std::ios::app);
+
+//     array< array< ll, 100>, 100> input = rand_array();
     
-    // Karmarkar-Karp
-    if (alg == 0){
-        file.open("karmarkar.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = karmarkar(input[i]);
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
+//     // Karmarkar-Karp
+//     auto start1 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         karmarkar(input[i]);
+//     }
+//     auto stop1 = high_resolution_clock::now();
+//     auto duration1 = duration_cast<nanoseconds>(stop1 - start1);
+//     float time1 = duration1.count();
 
-    // Repeated Random
-    if (alg == 1){
-        file.open("repeated_random.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = repeated_random(input[i], 0 );
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
-    // Hill Climbing
-    if (alg == 2){
-        file.open("hill.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = hill_climb(input[i], 0 );
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
-    // Simulated Annealing
-    if (alg == 3){
-        file.open("anneal.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = sim_anneal(input[i],0);
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
-    // Prepartitioned Repeated Random
-    if (alg == 11){
-        file.open("repeated_random_pp.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = repeated_random(input[i], 1);
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
-    // Prepartitioned Hill climbing
-    if (alg == 12){
-        file.open("hill_pp.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = hill_climb(input[i], 1);
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
-    // Prepartitioned Simulated Annealing
-    if (alg == 13){
-        file.open("anneal_pp.csv", std::ios::app);
-        auto start = high_resolution_clock::now();
-        for (int i = 0 ; i < 100; i ++){
-            ll answer = sim_anneal(input[i],1);
-            file << i << ", " << answer <<  "\n";
-        }
-        auto stop = high_resolution_clock::now();
-        auto duration = duration_cast<nanoseconds>(stop - start);
-        float time = duration.count();
-        file.close();
-    }
-}
-
-
-void data_collections_time(){
-    std::ofstream file;
-
-    file.open("time.csv", std::ios::app);
-
-       
+//     file << "Karmarkar-Karp" << ", " << time1 <<  "\n";
     
-
-    array< array< ll, 100>, 100> input = rand_array();
-    
-    // Karmarkar-Karp
-    auto start1 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        karmarkar(input[i]);
-    }
-    auto stop1 = high_resolution_clock::now();
-    auto duration1 = duration_cast<nanoseconds>(stop1 - start1);
-    float time1 = duration1.count();
-
-    file << "Karmarkar-Karp" << ", " << time1 <<  "\n";
-    
-
-    // Repeated Random
-    auto start2 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        repeated_random(input[i], 0 );
-    }
-    auto stop2 = high_resolution_clock::now();
-    auto duration2 = duration_cast<nanoseconds>(stop2 - start2);
-    float time2 = duration2.count();
+//     // Repeated Random
+//     auto start2 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         repeated_random(input[i], 0 );
+//     }
+//     auto stop2 = high_resolution_clock::now();
+//     auto duration2 = duration_cast<nanoseconds>(stop2 - start2);
+//     float time2 = duration2.count();
    
-   file << "Repeated Random" << ", " << time2 <<  "\n";
+//     file << "Repeated Random" << ", " << time2 <<  "\n";
     
-    // Hill Climbing
-    auto start3 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        hill_climb(input[i], 0 );
+//     // Hill Climbing
+//     auto start3 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         hill_climb(input[i], 0 );
     
-    }
-    auto stop3 = high_resolution_clock::now();
-    auto duration3 = duration_cast<nanoseconds>(stop3 - start3);
-    float time3 = duration3.count();
+//     }
+//     auto stop3 = high_resolution_clock::now();
+//     auto duration3 = duration_cast<nanoseconds>(stop3 - start3);
+//     float time3 = duration3.count();
     
-    file << "Hill climb" << ", " << time3 <<  "\n";
+//     file << "Hill climb" << ", " << time3 <<  "\n";
     
-    // Simulated Annealing
-    auto start4 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        sim_anneal(input[i],0);
+//     // Simulated Annealing
+//     auto start4 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         sim_anneal(input[i],0);
         
-    }
-    auto stop4 = high_resolution_clock::now();
-    auto duration4 = duration_cast<nanoseconds>(stop4 - start4);
-    float time4 = duration4.count();
+//     }
+//     auto stop4 = high_resolution_clock::now();
+//     auto duration4 = duration_cast<nanoseconds>(stop4 - start4);
+//     float time4 = duration4.count();
 
-    file << "sim anneal" << ", " << time4<<  "\n";
+//     file << "sim anneal" << ", " << time4<<  "\n";
     
-    // Prepartitioned Repeated Random
-    auto start5 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        repeated_random(input[i], 1);
+//     // Prepartitioned Repeated Random
+//     auto start5 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         repeated_random(input[i], 1);
         
-    }
-    auto stop5 = high_resolution_clock::now();
-    auto duration5 = duration_cast<nanoseconds>(stop5 - start5);
-    float time5 = duration5.count();
+//     }
+//     auto stop5 = high_resolution_clock::now();
+//     auto duration5 = duration_cast<nanoseconds>(stop5 - start5);
+//     float time5 = duration5.count();
 
-    file << "repeated random PP" << ", " << time5 <<  "\n";
+//     file << "repeated random PP" << ", " << time5 <<  "\n";
 
-    // Prepartitioned Hill climbing
-    auto start6 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        hill_climb(input[i], 1);
-    }
-    auto stop6 = high_resolution_clock::now();
-    auto duration6 = duration_cast<nanoseconds>(stop6 - start6);
-    float time6 = duration6.count();
+//     // Prepartitioned Hill climbing
+//     auto start6 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         hill_climb(input[i], 1);
+//     }
+//     auto stop6 = high_resolution_clock::now();
+//     auto duration6 = duration_cast<nanoseconds>(stop6 - start6);
+//     float time6 = duration6.count();
 
-    file << "Hill PP" << ", " << time6 <<  "\n";
+//     file << "Hill PP" << ", " << time6 <<  "\n";
 
-    // Prepartitioned Simulated Annealing
-    auto start7 = high_resolution_clock::now();
-    for (int i = 0 ; i < 100; i ++){
-        sim_anneal(input[i],1);
-    }
-    auto stop7 = high_resolution_clock::now();
-    auto duration7 = duration_cast<nanoseconds>(stop7 - start7);
-    float time7 = duration7.count();
+//     // Prepartitioned Simulated Annealing
+//     auto start7 = high_resolution_clock::now();
+//     for (int i = 0 ; i < 100; i ++){
+//         sim_anneal(input[i],1);
+//     }
+//     auto stop7 = high_resolution_clock::now();
+//     auto duration7 = duration_cast<nanoseconds>(stop7 - start7);
+//     float time7 = duration7.count();
 
-    file << "simm anneal PP" << ", " << time7 <<  "\n";
+//     file << "simm anneal PP" << ", " << time7 <<  "\n";
 
-    file.close();
-}
+//     file.close();
+// }
 
 
+////////////
+// DRIVER CODE
+////////////
 int main(int argc, char *argv[]){
 
     srand(time(NULL));
-
 
     if (argc != 4) {
         cerr << "Usage: ./kk flag algorithm inputfile\n";
@@ -670,40 +629,32 @@ int main(int argc, char *argv[]){
     f.close();
 
     int alg = atoi(argv[2]);
-    if (alg == 0)
-    {
+    if (alg == 0) {
         ll output = karmarkar(input);
         cout << output;
     }
-    else if (alg == 1)
-    {
+    else if (alg == 1) {
         ll output = repeated_random(input, false);
         cout << output;
     }
-    else if (alg == 2)
-    {
+    else if (alg == 2) {
         ll output = hill_climb(input, false);
         cout << output;
     }
-    else if (alg == 3)
-    {
+    else if (alg == 3) {
         ll output = sim_anneal(input, false);
         cout << output;
     }
-    else if (alg == 11)
-    {
+    else if (alg == 11) {
         ll output = repeated_random(input, true);
         cout << output;
     }
-    else if (alg == 12)
-    {
+    else if (alg == 12) {
         ll output = hill_climb(input, true);
         cout << output;
     }
-    else if (alg == 13)
-    {
+    else if (alg == 13) {
         ll output = sim_anneal(input, true);
         cout << output;
     }
-
 } 
