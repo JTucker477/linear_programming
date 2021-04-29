@@ -1,13 +1,12 @@
-// passes: karmakar, repeated rand standard, sim anneal PP, hill climb PP
+
+//NOW
 // FAILS
+    // repeated random standard: 11
+        // These numbers seem high
     // hill climb standard: 2
         // These numbers look way too low.
     // sim anneal standard: 3
-        // These numbers look way too low.
-// (^check rand neighbor - i think its fine, check calc residue standard)
-    // repeated random pp: 11
-        // These numbers seem high
-// ^????
+        // These numbers seem high.
 
 #include <stdio.h>
 #include <algorithm>
@@ -173,47 +172,56 @@ array <ll, 100 > random_solution_PP(){
 // REPEATED RANDOM
 ll repeated_random (array <ll , 100> input, bool pp){
 
-    array <ll , 100> solution;
+    // start with a random solution S
+    array <ll , 100> S;
     if (pp){
-        solution = random_solution_PP();
+        S = random_solution_PP();
     }
     else{
-        solution = random_solution();
+        S = random_solution();
     }
-    ll lowest_residue;
-
-    if (pp){
-        lowest_residue = calc_residue_PP(input, solution);
-    }
-    else{
-        lowest_residue = calc_residue(input, solution);
-    }
+    ll residueS;
  
     for (int j = 0; j < max_iter ; j ++ ){
-
-        // Try a new random solution
-        array <ll , 100> new_sol;
+        // residue(S)
         if (pp){
-            new_sol = random_solution_PP();
+            residueS = calc_residue_PP(input, S);
         }
         else{
-            new_sol  = random_solution();
+            residueS = calc_residue(input, S);
+        }
+        // Try a new random solution S'
+        array <ll , 100> S1;
+        if (pp){
+            S1 = random_solution_PP();
+        }
+        else{
+            S1  = random_solution();
         } 
-        ll current_residue; 
+        // residue(S')
+        ll residueS1; 
         if (pp){
-            current_residue = calc_residue_PP(input, solution);
+            residueS1 = calc_residue_PP(input, S1);
         }
         else{
-            current_residue = calc_residue(input, solution);
+            residueS1 = calc_residue(input, S1);
         }
 
+        // if residue(S') < residue(S) then s=S'
+        if (residueS1 < residueS){
 
-        if (current_residue < lowest_residue){
-
-            lowest_residue = current_residue;
+            // lowest_residue = current_residue;
+            S = S1;
         }
     }
-    return lowest_residue; 
+    if (pp){
+        residueS = calc_residue_PP(input, S);
+    }
+    else{
+        residueS = calc_residue(input, S);
+    }
+    return residueS; 
+    
 }
 
 // RANDOM NEIGHBOR GENERATION STANDARD
@@ -285,120 +293,144 @@ array <ll, 100 > random_neighbor_pp(array <ll , 100> sol){
 ll hill_climb (array <ll , 100> input, bool pp){
     //Start with a random solution S
 
-    // For each of the 100 instances of the problem
-    // ?? is the transform i's different?
-    array <ll , 100> solution;
+    array <ll , 100> S;
     if(pp){
-        solution = random_solution_PP();
+        S = random_solution_PP();
     }
     else{
-        solution = random_solution();
+        S = random_solution();
     }
-    ll lowest_residue;
-    if(pp){
-        lowest_residue = calc_residue_PP(input, solution);
-    }
-    else{
-        lowest_residue = calc_residue(input, solution);
-    } 
 
+    ll residueS;
     for (int j = 0; j < max_iter ; j ++ ){
-        // Try a new random solution
-        array <ll , 100> new_sol;
-        if (pp){
-            new_sol = random_neighbor_pp(solution);
+        // residue(S)
+        if(pp){
+            residueS = calc_residue_PP(input, S);
         }
         else{
-            new_sol = random_neighbor(solution);
-        }
-         
-        ll current_residue;
+            residueS = calc_residue(input, S);
+        } 
+        // Try a new random neighbor S'
+        array <ll , 100> S1;
         if (pp){
-            current_residue = calc_residue_PP(input, new_sol);
+            S1 = random_neighbor_pp(S);
         }
         else{
-            current_residue = calc_residue(input, new_sol);
+            S1 = random_neighbor(S);
         }
-        ;
-
-        if (current_residue < lowest_residue){
-            solution = new_sol; 
-            lowest_residue = current_residue;
+        // residue(S')
+        ll residueS1;
+        if (pp){
+            residueS1 = calc_residue_PP(input, S1);
+        }
+        else{
+            residueS1 = calc_residue(input, S1);
+        }
+        // if residue(S') < residue(S) then S=S'
+        if (residueS1 < residueS){
+            S = S1; 
+            // lowest_residue = current_residue;
         }
     }
-
-    return lowest_residue; 
+    if(pp){
+        residueS = calc_residue_PP(input, S);
+    }
+    else{
+        residueS = calc_residue(input, S);
+    } 
+    return residueS; 
 }
 
 //  simmulated annealing (pseudocode -- rn similar to hill climb except the improve with reesidues not always better)
 ll sim_anneal (array <ll , 100> input, bool pp){
+    
     //Start with a random solution S
-   
-    array <ll , 100> sol;
+    array <ll , 100> S;
     if (pp){
-        sol = random_solution_PP();
+        S = random_solution_PP();
     }
     else{
-        sol = random_solution();
+        S = random_solution();
     } 
 
-    array <ll , 100> s2 = sol;
-
-    ll lowest_residue;
-    if (pp){
-        lowest_residue = calc_residue_PP(input, sol);
-    } 
-    else{
-        lowest_residue = calc_residue(input, sol);
-    }
-
+    // S'' = S
+    array <ll , 100> S2 = S;
+    ll residueS;
+    ll residueS2;
     for (int j = 0; j < max_iter ; j ++ ){
-        // Try a new random solution
-        array <ll , 100> s1;
+        // residue(S)
         if (pp){
-            s1 = random_neighbor_pp(sol);
+            residueS = calc_residue_PP(input, S);
+        } 
+        else{
+            residueS = calc_residue(input, S);
+        }
+        // Try a new random neighbor S'
+        array <ll , 100>S1;
+        if (pp){
+            S1 = random_neighbor_pp(S);
         }
         else{
-            s1 = random_neighbor(sol);
+            S1 = random_neighbor(S);
         } 
-
-        ll residue1;
+        // residue(S')
+        ll residueS1;
         if (pp){
-            residue1 = calc_residue_PP(input, sol);
+            residueS1 = calc_residue_PP(input, S1);
         }
         else{
-            residue1 = calc_residue(input, sol);
+            residueS1 = calc_residue(input, S1);
         } 
 
-        if (residue1 < lowest_residue){
-            lowest_residue = residue1;
-            sol = s1;
+        // if residue(s') < residue(s) then S=S'
+        if (residueS1 < residueS){
+            // lowest_residue = residue1;
+            S = S1;
         }
+        //else S=S' with prob  ... 
         else {
-            float p = exp(-(residue1 - lowest_residue)/ (pow(10,10) * pow((0.8),floor(j / 300))));
+            if (pp){
+                residueS = calc_residue_PP(input, S);
+            }
+            else{
+                residueS = calc_residue(input, S);
+            }
+            float p = exp(-(residueS1 - residueS)/ (pow(10,10) * pow((0.8),floor(j / 300))));
 
             // this isn't TRULY random but close enough?
             if (static_cast <float> (rand()) / static_cast <float> (RAND_MAX) <= p) // https://stackoverflow.com/questions/686353/random-float-number-generation
             {
-                lowest_residue = residue1;
-                sol = s1;
+                // lowest_residue = residue1;
+                S = S1;
             }
         }
-        ll residue2;
+        // residue (S'')
+        
         if (pp){
-            residue2 = calc_residue_PP(input, sol);
+            residueS2 = calc_residue_PP(input, S2);
         }
         else{
-            residue2 = calc_residue(input, sol);
+            residueS2 = calc_residue(input, S2);
         } 
+        if (pp){
+            residueS = calc_residue_PP(input, S);
+        }
+        else{
+            residueS = calc_residue(input, S);
+        }
         // if residue(S) < residue(S′′) then S′′ = S
-        if (lowest_residue < residue2){
-            lowest_residue = residue2;
-            s2 = sol;
+        if (residueS < residueS2){
+            // residue2 = lowest_residue;
+            S2 = S;
         }
     }
-
-    return lowest_residue; 
+    if (pp){
+        residueS2 = calc_residue_PP(input, S2);
+    }
+    else{
+        residueS2 = calc_residue(input, S2);
+    } 
+    return residueS2; 
 }
 
 
